@@ -58,6 +58,37 @@ const googleFormFields = {
 
 function Registration({ isDark }) {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const consultationMessage = encodeURIComponent(
+    "Halo Pojok Ilmu, saya ingin konsultasi dulu sebelum mendaftar kelas.",
+  );
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    setIsSubmitting(true);
+
+    try {
+      await fetch(GOOGLE_FORM_ACTION, {
+        method: "POST",
+        mode: "no-cors",
+        body: formData,
+      });
+
+      setIsSubmitted(true);
+      form.reset();
+    } catch (error) {
+      alert(
+        "Pendaftaran gagal dikirim. Silakan coba lagi atau hubungi WhatsApp Pojok Ilmu.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const inputClass = isDark
     ? "w-full rounded-2xl border border-slate-700 bg-slate-800 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-[#FDCD00]"
@@ -217,18 +248,7 @@ function Registration({ isDark }) {
             </div>
           )}
 
-          <iframe
-            name="hiddenGoogleForm"
-            title="hiddenGoogleForm"
-            className="hidden"
-          />
-
-          <form
-            action={GOOGLE_FORM_ACTION}
-            method="POST"
-            target="_blank"
-            className="grid gap-5"
-          >
+          <form onSubmit={handleSubmit} className="grid gap-5">
             <input type="hidden" name="pageHistory" value="0" />
 
             <div>
@@ -408,14 +428,15 @@ function Registration({ isDark }) {
 
             <button
               type="submit"
+              disabled={isSubmitting}
               className={
                 isDark
-                  ? "inline-flex items-center justify-center gap-2 rounded-full bg-[#FDCD00] px-6 py-3 font-black text-[#014498] transition hover:bg-white"
-                  : "inline-flex items-center justify-center gap-2 rounded-full bg-[#0073E3] px-6 py-3 font-black text-white transition hover:bg-[#014498]"
+                  ? "inline-flex items-center justify-center gap-2 rounded-full bg-[#FDCD00] px-6 py-3 font-black text-[#014498] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+                  : "inline-flex items-center justify-center gap-2 rounded-full bg-[#0073E3] px-6 py-3 font-black text-white transition hover:bg-[#014498] disabled:cursor-not-allowed disabled:opacity-60"
               }
             >
               <Send size={19} />
-              Kirim Pendaftaran
+              {isSubmitting ? "Mengirim..." : "Kirim Pendaftaran"}
             </button>
 
             <p
@@ -430,9 +451,7 @@ function Registration({ isDark }) {
             </p>
 
             <a
-              href={`https://wa.me/6285712556125?text=${encodeURIComponent(
-                "Halo Pojok Ilmu, saya ingin konsultasi dulu sebelum mendaftar kelas.",
-              )}`}
+              href={`https://wa.me/6285712556125?text=${consultationMessage}`}
               target="_blank"
               rel="noreferrer"
               className={

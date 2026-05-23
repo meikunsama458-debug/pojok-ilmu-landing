@@ -226,13 +226,8 @@ function Registration({ isDark }) {
           <form
             action={GOOGLE_FORM_ACTION}
             method="POST"
-            target="hiddenGoogleForm"
+            target="_blank"
             className="grid gap-5"
-            onSubmit={() => {
-              setTimeout(() => {
-                setIsSubmitted(true);
-              }, 500);
-            }}
           >
             <input type="hidden" name="pageHistory" value="0" />
 

@@ -98,7 +98,7 @@ const tutors = [
     ],
   },
   {
-    name: "Arfa Rista Channiago, S.Pd",
+    name: "Arfa Rista Caniago, S.Pd",
     role: "English Tutor",
     photo: "tutors/arfa-rista.png",
     description:

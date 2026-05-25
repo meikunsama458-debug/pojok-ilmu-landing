@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { CheckCircle2, ClipboardList, MessageCircle, Send } from "lucide-react";
+import { supabase } from "../lib/supabaseClient";
 
 const termsSummary = [
   {
@@ -40,22 +41,6 @@ const termsSummary = [
   },
 ];
 
-const GOOGLE_FORM_ACTION =
-  "https://docs.google.com/forms/d/e/1FAIpQLSeSL4c-QpZHdnMzjp8u1KnzphH9RC2dPSZ8_8PvcrzM_3Vbbw/formResponse";
-
-const googleFormFields = {
-  agreement: "entry.86161339",
-  name: "entry.865556410",
-  whatsapp: "entry.819718953",
-  studentClass: "entry.394875850",
-  location: "entry.695607141",
-  parentName: "entry.667877564",
-  note: "entry.1023618802",
-  learningGoal: "entry.2029924862",
-  schedule: "entry.476013789",
-  program: "entry.1041201772",
-};
-
 function Registration({ isDark }) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -70,24 +55,37 @@ function Registration({ isDark }) {
     const form = event.currentTarget;
     const formData = new FormData(form);
 
+    const payload = {
+      student_name: formData.get("student_name"),
+      whatsapp: formData.get("whatsapp"),
+      parent_name: formData.get("parent_name"),
+      student_class: formData.get("student_class"),
+      location: formData.get("location"),
+      program: formData.get("program"),
+      learning_goal: formData.get("learning_goal"),
+      schedule_preference: formData.get("schedule_preference"),
+      note: formData.get("note") || null,
+      agreement: formData.get("agreement") === "true",
+      status: "new",
+    };
+
     setIsSubmitting(true);
+    setIsSubmitted(false);
 
-    try {
-      await fetch(GOOGLE_FORM_ACTION, {
-        method: "POST",
-        mode: "no-cors",
-        body: formData,
-      });
+    const { error } = await supabase.from("registrations").insert(payload);
 
-      setIsSubmitted(true);
-      form.reset();
-    } catch (error) {
+    if (error) {
+      console.error("Supabase insert error:", error);
       alert(
         "Pendaftaran gagal dikirim. Silakan coba lagi atau hubungi WhatsApp Pojok Ilmu.",
       );
-    } finally {
       setIsSubmitting(false);
+      return;
     }
+
+    setIsSubmitted(true);
+    form.reset();
+    setIsSubmitting(false);
   };
 
   const inputClass = isDark
@@ -224,7 +222,7 @@ function Registration({ isDark }) {
                   isDark ? "text-sm text-slate-400" : "text-sm text-[#5A6774]"
                 }
               >
-                Data akan masuk ke Google Form Pojok Ilmu.
+                Data akan masuk ke database Pojok Ilmu.
               </p>
             </div>
           </div>
@@ -238,6 +236,7 @@ function Registration({ isDark }) {
               }
             >
               <CheckCircle2 className="mt-0.5 shrink-0" size={22} />
+
               <div>
                 <p className="font-black">Pendaftaran berhasil dikirim!</p>
                 <p className="mt-1 text-sm leading-relaxed">
@@ -249,12 +248,10 @@ function Registration({ isDark }) {
           )}
 
           <form onSubmit={handleSubmit} className="grid gap-5">
-            <input type="hidden" name="pageHistory" value="0" />
-
             <div>
               <label className={labelClass}>Nama Lengkap Siswa</label>
               <input
-                name={googleFormFields.name}
+                name="student_name"
                 type="text"
                 required
                 placeholder="Contoh: Ahmad Rizky"
@@ -265,7 +262,7 @@ function Registration({ isDark }) {
             <div>
               <label className={labelClass}>Nomor WhatsApp</label>
               <input
-                name={googleFormFields.whatsapp}
+                name="whatsapp"
                 type="tel"
                 required
                 placeholder="Contoh: 081234567890"
@@ -276,7 +273,7 @@ function Registration({ isDark }) {
             <div>
               <label className={labelClass}>Nama Orang Tua / Wali</label>
               <input
-                name={googleFormFields.parentName}
+                name="parent_name"
                 type="text"
                 required
                 placeholder="Contoh: Bapak/Ibu ..."
@@ -288,7 +285,7 @@ function Registration({ isDark }) {
               <div>
                 <label className={labelClass}>Jenjang / Kelas</label>
                 <input
-                  name={googleFormFields.studentClass}
+                  name="student_class"
                   type="text"
                   required
                   placeholder="Contoh: Kelas 8 SMP"
@@ -299,7 +296,7 @@ function Registration({ isDark }) {
               <div>
                 <label className={labelClass}>Domisili</label>
                 <input
-                  name={googleFormFields.location}
+                  name="location"
                   type="text"
                   required
                   placeholder="Contoh: Bumiayu"
@@ -311,7 +308,7 @@ function Registration({ isDark }) {
             <div>
               <label className={labelClass}>Program yang Dipilih</label>
               <select
-                name={googleFormFields.program}
+                name="program"
                 required
                 className={inputClass}
                 defaultValue=""
@@ -346,7 +343,7 @@ function Registration({ isDark }) {
             <div>
               <label className={labelClass}>Tujuan Belajar</label>
               <select
-                name={googleFormFields.learningGoal}
+                name="learning_goal"
                 required
                 className={inputClass}
                 defaultValue=""
@@ -368,7 +365,7 @@ function Registration({ isDark }) {
             <div>
               <label className={labelClass}>Preferensi Jadwal</label>
               <select
-                name={googleFormFields.schedule}
+                name="schedule_preference"
                 required
                 className={inputClass}
                 defaultValue=""
@@ -390,7 +387,7 @@ function Registration({ isDark }) {
             <div>
               <label className={labelClass}>Catatan Tambahan</label>
               <textarea
-                name={googleFormFields.note}
+                name="note"
                 rows="4"
                 placeholder="Tulis kebutuhan belajar, target, kendala siswa, atau preferensi jam belajar."
                 className={inputClass}
@@ -413,8 +410,8 @@ function Registration({ isDark }) {
               >
                 <input
                   type="checkbox"
-                  name={googleFormFields.agreement}
-                  value="Dengan Mencentang Tombol Ini, Saya Menerima dan Setuju Terhadap S&K Yang Berlaku"
+                  name="agreement"
+                  value="true"
                   required
                   className="mt-1 h-4 w-4 accent-[#0073E3]"
                 />

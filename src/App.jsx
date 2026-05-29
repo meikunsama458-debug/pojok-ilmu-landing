@@ -1,21 +1,10 @@
 import { useEffect, useState } from "react";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
-import Navbar from "./components/Navbar";
-import Hero from "./components/Hero";
-import About from "./components/About";
-import Tutors from "./components/Tutors";
-import Programs from "./components/Programs";
-import LearningMethod from "./components/LearningMethod";
-import LearningFocus from "./components/LearningFocus";
-import Benefits from "./components/Benefits";
-import Testimonials from "./components/Testimonials";
-import Registration from "./components/Registration";
-import Scheduling from "./components/Scheduling";
-import ServiceArea from "./components/ServiceArea";
-import FAQ from "./components/FAQ";
-import CTA from "./components/CTA";
-import Footer from "./components/Footer";
-import FloatingWhatsApp from "./components/FloatingWhatsApp";
+import PublicHome from "./pages/PublicHome";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
 
 function App() {
   const [isDark, setIsDark] = useState(() => {
@@ -35,37 +24,27 @@ function App() {
           : "min-h-screen bg-[#FDFCF5] text-slate-950 transition-colors duration-300"
       }
     >
-      <Navbar isDark={isDark} setIsDark={setIsDark} />
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/"
+            element={<PublicHome isDark={isDark} setIsDark={setIsDark} />}
+          />
 
-      <Hero isDark={isDark} />
+          <Route path="/admin/login" element={<AdminLogin isDark={isDark} />} />
 
-      <About isDark={isDark} />
+          <Route
+            path="/admin"
+            element={
+              <AdminProtectedRoute isDark={isDark}>
+                <AdminDashboard isDark={isDark} />
+              </AdminProtectedRoute>
+            }
+          />
 
-      <Tutors isDark={isDark} />
-
-      <Programs isDark={isDark} />
-
-      <LearningMethod isDark={isDark} />
-
-      <LearningFocus isDark={isDark} />
-
-      <Benefits isDark={isDark} />
-
-      <Testimonials isDark={isDark} />
-
-      <Registration isDark={isDark} />
-
-      <Scheduling isDark={isDark} />
-
-      <ServiceArea isDark={isDark} />
-
-      <FAQ isDark={isDark} />
-
-      <CTA isDark={isDark} />
-
-      <Footer isDark={isDark} />
-
-      <FloatingWhatsApp />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
     </main>
   );
 }

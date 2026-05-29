@@ -134,7 +134,7 @@ function Tutors({ isDark }) {
   };
 
   return (
-    <section id="tutor" className="mx-auto max-w-7xl px-6 py-20">
+    <section id="tutor" className="mx-auto max-w-6xl px-6 py-20">
       <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-3xl text-left">
           <p className="font-bold text-[#0073E3]">Tim Tutor</p>

@@ -20,7 +20,7 @@ A responsive registration website for Pojok Ilmu, an English & Public Speaking t
 - Netlify
 
 ## Live Demo
-[Website Link]
+https://pojokilmuv3.netlify.app
 
 ## Status
-Production / MVP
+Production
